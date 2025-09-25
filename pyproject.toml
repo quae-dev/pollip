@@ -1,0 +1,21 @@
+[project]
+name = "pollip"
+version = "0.1.0"
+description = "Library for modifying Hollow Knight: Silksong save data"
+readme = "README.md"
+license = "BSD-3-Clause"
+authors = [
+    { name = "Quae", email = "quae.dev@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "cryptography>=46.0.1",
+    "mini-nrbf",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.15,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+mini-nrbf = { git = "https://github.com/quae-dev/mini-nrbf.git" }
