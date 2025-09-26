@@ -20,40 +20,32 @@ __all__ = ["decrypt_json", "encrypt_json"]
 
 AES_256_KEY = b"UKu52ePUBwetZ9wNX88o54dnfKRu0T1l"
 AES_256_ECB_CIPHER = Cipher(AES256(AES_256_KEY), ECB())  # noqa: S305
-PAD_BITS = 0x80
-
-
-class Context(t.Protocol):
-    def update(self, data: Buffer) -> bytes: ...
-    def finalize(self) -> bytes: ...
-
-
-def _apply(ctx: Context, data: Buffer) -> bytes:
-    return ctx.update(data) + ctx.finalize()
+AES_BLOCK_SIZE = 128
+PKCS7_PADDING = PKCS7(AES_BLOCK_SIZE)
 
 
 def _encrypt(data: Buffer) -> bytes:
     """Encrypt data using AES-256-ECB."""
     encryptor = AES_256_ECB_CIPHER.encryptor()
-    return _apply(encryptor, data)
+    return encryptor.update(data) + encryptor.finalize()
 
 
 def _decrypt(data: Buffer) -> bytes:
     """Decrypt data using AES-256-ECB."""
     decryptor = AES_256_ECB_CIPHER.decryptor()
-    return _apply(decryptor, data)
+    return decryptor.update(data) + decryptor.finalize()
 
 
-def _pad(data: Buffer, block_size: int = PAD_BITS) -> bytes:
+def _pad(data: Buffer) -> bytes:
     """Add PKCS#7 padding."""
-    padder = PKCS7(block_size).padder()
-    return _apply(padder, data)
+    padder = PKCS7_PADDING.padder()
+    return padder.update(data) + padder.finalize()
 
 
-def _unpad(data: Buffer, block_size: int = PAD_BITS) -> bytes:
+def _unpad(data: Buffer) -> bytes:
     """Remove PKCS#7 padding."""
-    unpadder = PKCS7(block_size).unpadder()
-    return _apply(unpadder, data)
+    unpadder = PKCS7_PADDING.unpadder()
+    return unpadder.update(data) + unpadder.finalize()
 
 
 def encrypt_json(json_data: dict[str, t.Any]) -> bytes:
