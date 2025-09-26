@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import contextlib
-import pathlib
 import typing as t
 
 import mini_nrbf
@@ -28,8 +27,7 @@ class _SaveFileRecords(t.NamedTuple):
 
 
 def _parse_save_file_records(path: os.PathLike[str] | str) -> _SaveFileRecords:
-    data = pathlib.Path(path).read_bytes()
-    records = tuple(mini_nrbf.parse_bytes(data))
+    records = tuple(mini_nrbf.parse_file(path))
     return _SaveFileRecords(*t.cast("_SaveFileRecords", records))
 
 
